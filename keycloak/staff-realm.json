@@ -1,0 +1,62 @@
+{
+  "realm": "staff",
+  "displayName": "Bhatia Brothers Staff",
+  "enabled": true,
+  "sslRequired": "external",
+  "loginWithEmailAllowed": true,
+  "bruteForceProtected": true,
+  "groups": [
+    { "name": "Sales" },
+    { "name": "Accounts" },
+    { "name": "Workshop" }
+  ],
+  "clients": [
+    {
+      "clientId": "portal",
+      "name": "Staff Portal",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${KC_PORTAL_CLIENT_SECRET}",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "rootUrl": "${KC_PORTAL_URL}",
+      "baseUrl": "/dashboard",
+      "redirectUris": ["${KC_PORTAL_URL}/api/auth/callback"],
+      "webOrigins": ["${KC_PORTAL_URL}"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "${KC_PORTAL_URL}/login"
+      },
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "config": {
+            "claim.name": "groups",
+            "full.path": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "test.sales",
+      "firstName": "Test",
+      "lastName": "Sales",
+      "email": "test.sales@example.com",
+      "emailVerified": true,
+      "enabled": true,
+      "groups": ["/Sales"],
+      "credentials": [{ "type": "password", "value": "${KC_TEST_USER_PASSWORD}", "temporary": false }]
+    }
+  ]
+}
