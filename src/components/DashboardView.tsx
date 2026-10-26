@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AppGrid } from "./AppGrid";
 import { useSession } from "./SessionProvider";
@@ -8,7 +9,7 @@ function formatTime(ts: number): string {
   return new Date(ts).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
-export function DashboardView() {
+export function DashboardView({ isAdmin = false }: { isAdmin?: boolean }) {
   const { session } = useSession();
   const [today, setToday] = useState<string | null>(null);
 
@@ -27,6 +28,16 @@ export function DashboardView() {
             Welcome, {session?.user ?? "there"}
           </h2>
           <p className="mt-1 text-muted">Choose an app or agent. You are already signed in to all of them.</p>
+          {isAdmin ? (
+            <nav aria-label="Admin" className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px]">
+              <Link href="/dashboard/activity" className="font-semibold underline decoration-silver underline-offset-4 hover:text-accent">
+                Activity log
+              </Link>
+              <Link href="/dashboard/api-keys" className="font-semibold underline decoration-silver underline-offset-4 hover:text-accent">
+                API keys
+              </Link>
+            </nav>
+          ) : null}
         </div>
         <div className="grid gap-0.5 text-right font-mono-brand text-[12.5px] text-muted">
           <span suppressHydrationWarning>{today}</span>

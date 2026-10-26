@@ -14,7 +14,7 @@ import { useSession } from "./SessionProvider";
 // shouldn't block signing out of the portal itself. `keepalive` lets the
 // requests finish even though the page navigates away straight after.
 function signOutOfAgentApps() {
-  for (const baseUrl of Object.values(SSO_TARGETS)) {
+  for (const { url: baseUrl } of Object.values(SSO_TARGETS)) {
     if (!baseUrl) continue;
     fetch(`${baseUrl}/api/auth/logout`, {
       method: "POST",

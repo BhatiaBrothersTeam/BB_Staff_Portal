@@ -8,7 +8,8 @@
   "groups": [
     { "name": "Sales" },
     { "name": "Accounts" },
-    { "name": "Workshop" }
+    { "name": "Workshop" },
+    { "name": "Admin" }
   ],
   "clients": [
     {

@@ -1,0 +1,53 @@
+// Staff Portal database (Azure PostgreSQL). The connection string comes from
+// DATABASE_URL in .env.local — see prisma.config.ts and prisma/README.md.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// One row per app/agent allowed to write to the activity log. Only a SHA-256
+// hash of the API key is stored; the plaintext key is shown once, when an
+// admin generates it at /dashboard/api-keys, and never again.
+model ApiClient {
+  id         String    @id @default(cuid())
+  /// App code from src/lib/apps.ts (e.g. "LGA"). One key per app.
+  appId      String    @unique @map("app_id")
+  name       String
+  apiKeyHash String    @unique @map("api_key_hash")
+  /// First characters of the key, so admins can tell which key an app holds.
+  keyPrefix  String    @map("key_prefix")
+  createdBy  String    @map("created_by")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUsedAt DateTime? @map("last_used_at") @db.Timestamptz(3)
+  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz(3)
+
+  @@map("api_clients")
+}
+
+// Everything staff do across the portal's apps and agents, reported by each
+// app to POST /api/activity. `appId` always comes from the caller's API key,
+// never from the request body.
+model ActivityLog {
+  id         String   @id @default(cuid())
+  /// The user's SSO id (the `sub` the portal put in the handoff token).
+  userId     String   @map("user_id")
+  appId      String   @map("app_id")
+  /// Dotted action name, e.g. "lead.created" or "lead.status_changed".
+  action     String
+  entityType String?  @map("entity_type")
+  entityId   String?  @map("entity_id")
+  metadata   Json?
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([userId, createdAt])
+  @@index([appId, createdAt])
+  @@index([action])
+  @@map("activity_logs")
+}
